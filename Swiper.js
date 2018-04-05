@@ -33,20 +33,6 @@ class Swiper extends Component {
     this.initializeStack();
   }
 
-  shouldComponentUpdate = (nextProps, nextState) => {
-    const { props, state } = this;
-    const propsChanged = (
-      !_.isEqual(props.cards, nextProps.cards) ||
-      props.cardIndex !== nextProps.cardIndex
-    );
-    const stateChanged = (
-      nextState.firstCardIndex !== state.firstCardIndex ||
-      nextState.secondCardIndex !== state.secondCardIndex ||
-      nextState.previousCardIndex !== state.previousCardIndex
-    );
-    return propsChanged || stateChanged;
-  }
-
   initializeStack = () => {
     this.props.cards.forEach((card, index) => {
       const factor = index < this.props.stackSize ? index : this.props.stackSize;
@@ -57,15 +43,17 @@ class Swiper extends Component {
   }
 
   componentWillReceiveProps = (newProps) => {
-    this.setState({
-      ...this.calculateCardIndexes(newProps.cardIndex, newProps.cards),
-      cards: newProps.cards,
-      previousCardX: new Animated.Value(newProps.previousCardInitialPositionX),
-      previousCardY: new Animated.Value(newProps.previousCardInitialPositionY),
-      swipedAllCards: false,
-      panResponderLocked: newProps.cards && newProps.cards.length === 0,
-      slideGesture: false
-    });
+    if (!_.isEqual(this.props.cards, newProps.cards)) {
+      this.setState({
+        ...this.calculateCardIndexes(newProps.cardIndex, newProps.cards),
+        cards: newProps.cards,
+        previousCardX: new Animated.Value(newProps.previousCardInitialPositionX),
+        previousCardY: new Animated.Value(newProps.previousCardInitialPositionY),
+        swipedAllCards: false,
+        panResponderLocked: newProps.cards && newProps.cards.length === 0,
+        slideGesture: false
+      });
+    }
   }
 
   calculateCardIndexes = (firstCardIndex, cards) => {
